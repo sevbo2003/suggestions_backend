@@ -180,6 +180,14 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
+# Phone number field
+PHONENUMBER_DEFAULT_REGION = 'UZ'
+
+# Token length for OTP
+TOKEN_LENGTH = 6
+
+# Token expiry
+TOKEN_EXPIRE_MINUTES = 1
 
 # Application definitions
 

@@ -6,6 +6,7 @@ django-extensions
 django-crispy-forms
 djangorestframework
 djangorestframework-simplejwt
+phonenumbers==8.13.1
 drf-yasg
 coreapi
 markdown
