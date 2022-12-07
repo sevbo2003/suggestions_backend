@@ -22,7 +22,7 @@ class PhoneNumberAuthBackend(ModelBackend):
             if not phonenumbers.is_valid_number(number):
                 return False
             try:
-                user = User.objects.get(phone__phone_number=number)
+                user = User.objects.get(username=number)
                 if user.check_password(password):
                     return user
             except User.DoesNotExist:
