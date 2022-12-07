@@ -17,12 +17,11 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'ilova_backend_4.1.0_0.1.0')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG', type=bool, default=True)
 
-ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', type=list, default=['*'])
+ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', type=list, default=[])
 
 # If the app is running behind a proxy, this variable must be set with the proxy path
 # See https://docs.djangoproject.com/en/0.1.0/ref/settings/#force-script-name
 
-FORCE_SCRIPT_NAME = os.getenv('PROXY_SCRIPT_NAME', None)
 
 
 # Application definition
@@ -42,6 +41,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'rest_framework',
     'rest_framework.authtoken',
+    'phonenumber_field',
 
     # Local apps
     'apps.accounts'
@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # Internationalization
 # https://docs.djangoproject.com/en/0.1.0/topics/i18n/
 
-LANGUAGE_CODE = 'pt-BR'
+LANGUAGE_CODE = 'En-us'
 
 TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
@@ -130,13 +130,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/0.1.0/howto/static-files/
 
-STATIC_PATH = os.getenv('STATIC_PATH', '/static/')
-STATIC_URL = os.getenv(
-    'STATIC_URL',
-    (FORCE_SCRIPT_NAME + STATIC_PATH if FORCE_SCRIPT_NAME else STATIC_PATH),
-)
-STATIC_ROOT = os.getenv('STATIC_ROOT')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 
 
 # django-cors-headers
@@ -167,6 +163,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
 }
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth'
