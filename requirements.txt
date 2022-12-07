@@ -7,6 +7,7 @@ django-crispy-forms
 djangorestframework
 djangorestframework-simplejwt
 phonenumbers==8.13.1
+django-phonenumber-field==7.0.1
 drf-yasg
 coreapi
 markdown
