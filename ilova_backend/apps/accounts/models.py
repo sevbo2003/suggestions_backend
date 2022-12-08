@@ -8,12 +8,15 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from apps.accounts.managers.phone_number_user_manager import PhoneNumberUserManager
 from django.db import models
-from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from sendsms.message import SmsMessage
+from eskiz_sms import EskizSMS
 
 
+eskiz = EskizSMS(
+            email=getattr(settings, 'ESKIZ_EMAIL', None),
+            password=getattr(settings, 'ESKIZ_PASSWORD', None),
+        )
 
 
 class PhoneNumberAbstactUser(AbstractUser):
@@ -51,17 +54,8 @@ class PhoneToken(models.Model):
             otp = cls.generate_otp(length=getattr(settings, 'PHONE_LOGIN_OTP_LENGTH', 6))
             phone_token = PhoneToken(phone_number=number, otp=otp)
             phone_token.save()
-            from_phone = getattr(settings, 'SENDSMS_FROM_NUMBER')
-            message = SmsMessage(
-                body=render_to_string(
-                    "otp_sms.txt",
-                    {"otp": otp, "id": phone_token.id}
-                ),
-                from_phone=from_phone,
-                to=[number]
-
-            )
-            message.send()
+            message = f"Sizning bir martalik parolingiz: {otp}"
+            eskiz.send_sms(str(number)[1:], message, from_whom='+998991856803')
             return phone_token
         else:
             return False
