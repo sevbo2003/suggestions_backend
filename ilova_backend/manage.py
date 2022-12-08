@@ -7,7 +7,7 @@ import dotenv
 
 
 def main():
-    dotenv.read_dotenv(override=True)
+    dotenv.load_dotenv(override=True)
 
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
     try:
