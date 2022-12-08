@@ -15,7 +15,7 @@ def too_many_requests():
 
 def unauthorized():
     STATUS["status"] = status.HTTP_401_UNAUTHORIZED
-    STATUS["message"] = "User not logged in."
+    STATUS["message"] = "Foydalanuchi ro'yxatdan o'tmagan."
     return (STATUS, STATUS["status"])
 
 
