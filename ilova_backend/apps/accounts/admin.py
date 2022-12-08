@@ -1,25 +1,13 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
-from django.utils.translation import gettext_lazy as _
-from phonenumber_field.formfields import PhoneNumberField
 
-from .models import CustomUser
+from .models import PhoneToken
 
 
-# class CustomUserAdmin(UserAdmin):
-    # fieldsets = (
-    #     (None, {'fields': ('username', 'password')}),
-    #     (_('Permissions'), {
-    #         'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
-    #     }),
-    #     (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-    # )
-    # list_display = ('username', 'is_verified', 'is_staff')
-    # search_fields = ('username',)
-    # ordering = ('username',)
-    # filter_horizontal = ('groups', 'user_permissions',)
-    # list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups', 'is_verified')
+class PhoneTokenAdmin(admin.ModelAdmin):
+    list_display = ('phone_number', 'otp', 'timestamp', 'attempts', 'used')
+    search_fields = ('phone_number', )
+    list_filter = ('timestamp', 'attempts', 'used')
+    readonly_fields = ('phone_number', 'otp', 'timestamp', 'attempts')
 
 
-admin.site.register(CustomUser)
-            
+admin.site.register(PhoneToken, PhoneTokenAdmin)
