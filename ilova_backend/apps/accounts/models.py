@@ -55,7 +55,7 @@ class PhoneToken(models.Model):
             phone_token = PhoneToken(phone_number=number, otp=otp)
             phone_token.save()
             message = f"Sizning bir martalik parolingiz: {otp}"
-            eskiz.send_sms(str(number)[1:], message, from_whom='4546')
+            # eskiz.send_sms(str(number)[1:], message, from_whom='4546')
             return phone_token
         else:
             return False
