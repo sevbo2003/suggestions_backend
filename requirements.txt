@@ -10,6 +10,7 @@ phonenumbers==8.13.1
 django-phonenumber-field==7.0.1
 pyotp=2.7.0
 eskiz_sms
+geopy
 drf-yasg
 coreapi
 markdown
