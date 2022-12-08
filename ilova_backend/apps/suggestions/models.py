@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from shortuuid.django_fields import ShortUUIDField
 from core.geo_finder import get_location
 import uuid
 
@@ -24,7 +25,7 @@ class Status(models.TextChoices):
 
 
 class Problem(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid1, editable=False)
+    id = ShortUUIDField(primary_key=True, length=5, max_length=9, db_index=True, editable=False, unique=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="problems")
     city = models.CharField(max_length=100)
     district = models.CharField(max_length=100)
