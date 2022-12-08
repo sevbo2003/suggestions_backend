@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'phonenumber_field',
 
     # Local apps
-    'apps.accounts'
+    'apps.accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +116,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # Internationalization
 # https://docs.djangoproject.com/en/0.1.0/topics/i18n/
 
-LANGUAGE_CODE = 'En-us'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
@@ -157,13 +157,20 @@ CORS_ALLOW_METHODS = getenv(
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 100,
 }
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.PhoneNumberAbstactUser'
+# AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTHENTICATION_BACKENDS = (
+    'apps.accounts.backends.phone_backend.PhoneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth'
@@ -191,3 +198,18 @@ TOKEN_EXPIRE_MINUTES = 1
 APP_VERSION = '1.0.0'
 APP_NAME = 'Ilova API'
 APP_DESCRIPTION = 'A RESTfull API for project Ilova API'
+
+
+
+# Configure the SENDSMS_BACKEND (for django-sendsms integration)
+
+SENDSMS_BACKEND = 'sendsms.backends.console.SmsBackend' #(defaults to 'sendsms.backends.console.SmsBackend')
+SENDSMS_FROM_NUMBER = "+XXxxxxxxxxxx" 
+SENDSMS_ACCOUNT_SID = 'ACXXXXXXXXXXXXXX'
+SENDSMS_AUTH_TOKEN = 'xxxxxxxx' 
+
+# Sms sending confs
+PHONE_LOGIN_ATTEMPTS = 10
+PHONE_LOGIN_OTP_LENGTH = 6
+PHONE_LOGIN_OTP_HASH_ALGORITHM = 'sha256'
+PHONE_LOGIN_DEBUG = True  # will include otp in generate response, default is False.
