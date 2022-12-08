@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'phonenumber_field',
+    'sendsms',
 
     # Local apps
     'apps.accounts.apps.AccountsConfig',
@@ -201,15 +202,6 @@ APP_DESCRIPTION = 'A RESTfull API for project Ilova API'
 
 
 
-# Configure the SENDSMS_BACKEND (for django-sendsms integration)
-
-SENDSMS_BACKEND = 'sendsms.backends.console.SmsBackend' #(defaults to 'sendsms.backends.console.SmsBackend')
-SENDSMS_FROM_NUMBER = "+XXxxxxxxxxxx" 
-SENDSMS_ACCOUNT_SID = 'ACXXXXXXXXXXXXXX'
-SENDSMS_AUTH_TOKEN = 'xxxxxxxx' 
-
-# Sms sending confs
-PHONE_LOGIN_ATTEMPTS = 10
-PHONE_LOGIN_OTP_LENGTH = 6
-PHONE_LOGIN_OTP_HASH_ALGORITHM = 'sha256'
-PHONE_LOGIN_DEBUG = True  # will include otp in generate response, default is False.
+# Configure the ESKIZ (for eskiz_sms integration)
+ESKIZ_EMAIL = os.getenv('ESKIZ_EMAIL')
+ESKIZ_PASSWORD = os.getenv('ESKIZ_PASSWORD')
