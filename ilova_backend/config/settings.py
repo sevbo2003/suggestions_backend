@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # Local apps
     'apps.accounts.apps.AccountsConfig',
+    'apps.suggestions.apps.SuggestionsConfig',
 ]
 
 MIDDLEWARE = [
