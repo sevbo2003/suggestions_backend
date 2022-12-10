@@ -13,6 +13,8 @@ class ProblemFilter(filters.FilterSet):
         ('last_month', 'Last Month'),
         ('this_year', 'This Year'),
         ('last_year', 'Last Year'),
+        ('last_7_days', 'Last 7 Days'),
+        ('last_30_days', 'Last 30 Days'),
     )
     date = filters.ChoiceFilter(choices=date_choices, method='filter_date')
     status_choices = (
@@ -36,6 +38,10 @@ class ProblemFilter(filters.FilterSet):
             return queryset.filter(date__week=today.isocalendar()[1])
         elif value == 'last_week':
             return queryset.filter(date__week=today.isocalendar()[1] - 1)
+        elif value == 'last_7_days':
+            return queryset.filter(date__gte=today - timedelta(days=7))
+        elif value == 'last_30_days':
+            return queryset.filter(date__gte=today - timedelta(days=30))
         elif value == 'this_month':
             return queryset.filter(date__month=today.month)
         elif value == 'last_month':
