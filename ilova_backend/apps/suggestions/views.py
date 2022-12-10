@@ -1,6 +1,7 @@
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.decorators import action
 from apps.suggestions.models import ProblemType, Problem, Status
 from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerializer, CreateProblemSerializer
 from apps.suggestions.filters import ProblemFilter
@@ -23,6 +24,15 @@ class ProblemViewSets(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     filterset_class = ProblemFilter
+
+    @action(detail=False, methods=['get'])
+    def count_problems_by_status(self, request):
+        return Response({
+            "all": self.get_queryset().count(),
+            "solved": self.get_queryset().filter(status=Status.SOLVED).count(),
+            "pending": self.get_queryset().filter(status=Status.PENDING).count(),
+            "fake": self.get_queryset().filter(status=Status.FAKE).count()
+        })
 
     def destroy(self, request, *args, **kwargs):
         problem = self.get_object()
