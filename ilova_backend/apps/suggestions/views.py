@@ -26,7 +26,7 @@ class ProblemViewSets(viewsets.ModelViewSet):
     filterset_class = ProblemFilter
 
     @action(detail=False, methods=['get'])
-    def count_problems_by_status(self, request):
+    def statistics(self, request):
         return Response({
             "all": self.get_queryset().count(),
             "solved": self.get_queryset().filter(status=Status.SOLVED).count(),
@@ -45,6 +45,27 @@ class ProblemViewSets(viewsets.ModelViewSet):
                 "fake": self.get_queryset().filter(city=city, status=Status.FAKE).count()
             })
         return Response({"detail": "City is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def pending_problems(self, request):
+        uzb_cities = ['Toshkent', 'Andijon', 'Buxoro', 'Farg\'ona', 'Jizzax', 'Namangan', 'Navoiy', 'Qashqadaryo', 'Qoraqalpog\'iston Respublikasi', 'Samarqand', 'Sirdaryo', 'Surxondaryo', 'Xorazm']
+        # [{i: self.get_queryset().filter(city=i, status=Status.PENDING).count()} for i in uzb_cities]
+        result = []
+        for i in uzb_cities:
+            count = self.get_queryset().filter(city=i, status=Status.PENDING).count()
+            if count != 0:
+                result.append({i: count})
+        return Response(result, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'])
+    def solved_problems(self, request):
+        uzb_cities = ['Toshkent', 'Andijon', 'Buxoro', 'Farg\'ona', 'Jizzax', 'Namangan', 'Navoiy', 'Qashqadaryo', 'Qoraqalpog\'iston Respublikasi', 'Samarqand', 'Sirdaryo', 'Surxondaryo', 'Xorazm']
+        result = []
+        for i in uzb_cities:
+            count = self.get_queryset().filter(city=i, status=Status.SOLVED).count()
+            if count != 0:
+                result.append({i: count})
+        return Response(result, status=status.HTTP_200_OK)
 
     def destroy(self, request, *args, **kwargs):
         problem = self.get_object()
