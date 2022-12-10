@@ -16,11 +16,3 @@ coreapi
 markdown
 packaging
 smart-getenv
-coverage
-ipython
-jupyter
-black
-pep8
-autopep8
-pylint
-pylint-django
