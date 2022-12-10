@@ -1,8 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from shortuuid.django_fields import ShortUUIDField
+from shortuuid.django_fields import ShortUUIDField, ShortUUID
 from core.geo_finder import get_location
-import uuid
 
 User = get_user_model()
 
@@ -25,10 +24,9 @@ class Status(models.TextChoices):
 
 
 class Problem(models.Model):
-    id = ShortUUIDField(primary_key=True, length=5, max_length=9, db_index=True, editable=False, unique=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="problems")
-    city = models.CharField(max_length=100)
-    district = models.CharField(max_length=100)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_problems")
+    city = models.CharField(max_length=100, null=True, blank=True)
+    district = models.CharField(max_length=100, null=True, blank=True)
     images = models.FileField(upload_to="%Y/%m/%d/")
     date = models.DateTimeField(auto_now_add=True)
     problem_types = models.ManyToManyField(ProblemType, related_name="problems")
@@ -46,6 +44,5 @@ class Problem(models.Model):
         verbose_name_plural = "Arizalar"
     
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
         self.city, self.district = get_location(str(self.lon), str(self.lat))
         super().save(*args, **kwargs)
