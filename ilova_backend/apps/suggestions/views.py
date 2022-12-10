@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from apps.suggestions.models import ProblemType, Problem, Status
 from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerializer, CreateProblemSerializer
+from apps.suggestions.filters import ProblemFilter
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 
@@ -21,6 +22,7 @@ class ProblemViewSets(viewsets.ModelViewSet):
     serializer_class = ProblemSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
+    filterset_class = ProblemFilter
 
     def destroy(self, request, *args, **kwargs):
         problem = self.get_object()
