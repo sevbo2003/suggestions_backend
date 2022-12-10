@@ -33,6 +33,18 @@ class ProblemViewSets(viewsets.ModelViewSet):
             "pending": self.get_queryset().filter(status=Status.PENDING).count(),
             "fake": self.get_queryset().filter(status=Status.FAKE).count()
         })
+    
+    @action(detail=False, methods=['get'])
+    def count_problems_by_city(self, request):
+        city = request.query_params.get('city')
+        if city:
+            return Response({
+                "all": self.get_queryset().filter(city=city).count(),
+                "solved": self.get_queryset().filter(city=city, status=Status.SOLVED).count(),
+                "pending": self.get_queryset().filter(city=city, status=Status.PENDING).count(),
+                "fake": self.get_queryset().filter(city=city, status=Status.FAKE).count()
+            })
+        return Response({"detail": "City is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         problem = self.get_object()
