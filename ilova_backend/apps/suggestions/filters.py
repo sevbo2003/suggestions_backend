@@ -28,15 +28,14 @@ class ProblemFilter(filters.FilterSet):
     
     def filter_date(self, queryset, name, value):
         today = date.today()
-        print(today)
         if value == 'today':
             return queryset.filter(date__date=today)
         elif value == 'yesterday':
             return queryset.filter(date__date=today - timedelta(days=1))
         elif value == 'this_week':
-            return queryset.filter(date__week=today.week)
+            return queryset.filter(date__week=today.isocalendar()[1])
         elif value == 'last_week':
-            return queryset.filter(date__week=today.week - 1)
+            return queryset.filter(date__week=today.isocalendar()[1] - 1)
         elif value == 'this_month':
             return queryset.filter(date__month=today.month)
         elif value == 'last_month':
