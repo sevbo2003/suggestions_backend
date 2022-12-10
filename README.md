@@ -3,7 +3,7 @@ A project template with common setups to start projects with Django + Django RES
 
 # Features
 
--  Django 2.2+
+-  Django 3.2+
 -  Django REST framework 3.10+
 -  Environment variables loading with [django-dotenv](https://github.com/jpadilla/django-dotenv)
 -  Generating documentation from OpenAPI schemas with [drf-yasg](https://github.com/axnsan12/drf-yasg/)
@@ -13,32 +13,22 @@ A project template with common setups to start projects with Django + Django RES
 # Installation
 
 ```bash
-$ django-admin.py startproject \
-  --template=https://github.com/weynelucas/drf-project-template/archive/master.zip \
-  --extension=py,md,env,yml \
-  project_name
-$ cd project_name
+$ git clone https://github.com/sevbo2003/ilova_backend.git
+$ cd ilova_backend
 $ pip install -r requirements.txt
-```
-
-# Describing your application
-At the end of the `settings.py` you can describe your aplication (name, description and release version). Theese informations will be displayed inside documentation (Swagger and Redoc) and inside the navigation bar of the Browseable API 
-
-```python
-# settings.py
-
-APP_VERSION = '1.0.0'
-APP_NAME = 'Your project name'
-APP_DESCRIPTION = 'Your project description'
+$ cd ilova_backend
+$ python manage.py make migrations
+$ python manage.py migrate
+$ python manage.py runserver
 ```
 
 # Configuring applications
 
-This project template highly recommends Django apps to be placed inside `apps/` directory. To work with this configuration you need first to run the `startapp`command inside this directory:
+Django apps to be placed inside `apps/` directory. To work with this configuration you need first to run the `startapp`command inside this directory:
 
 ```bash
 $ cd project/apps
-$ python ../manage.py startapp pools
+$ python ../manage.py startapp accounts
 ```
 
 After create the app folder, go to the `AppConfig` subclass (inside `apps.py`) and provide a proper name, wich is a dotted path to the application module:
@@ -48,14 +38,14 @@ from django.apps import AppConfig
 
 
 class PoolsConfig(AppConfig):
-    name = 'apps.pools'
+    name = 'apps.accounts'
     
 ```
 
 Inside `__init__.py` file inside your module, set the `default_app_config` variable with the dotted path to your `AppConfig` subclass:
 
 ```python
-default_app_config = 'apps.pools.apps.PoolsConfig'
+default_app_config = 'apps.accounts.apps.AccountsConfig'
 ```
 
 Finnaly, install your app using the configured dotted path:
@@ -65,12 +55,12 @@ Finnaly, install your app using the configured dotted path:
 
 INSTALLED_APPS = [
   ...
-  'apps.pools',
+  'apps.accounts',
 ]
 ```
 
 # Settings
-You can setting your application with envinronment variables. Create a `.env` file inside the `project/` directory and set your environment variables, most variables names refer to [Django settings](https://docs.djangoproject.com/en/2.2/ref/settings/). 
+You should set application with envinronment variables. Rename a `.env.example` file to `.env` inside the `ilova_backend/` directory and set your environment variables, most variables names refer to [Django settings](https://docs.djangoproject.com/en/3.2/ref/settings/). 
 
 ## Core settings
 
@@ -78,18 +68,16 @@ You can setting your application with envinronment variables. Create a `.env` fi
 | --------------- | ------------------------------------------------------------------------------------ | :-------: |
 | `DEBUG`         | Turns on/off debug mode. Never deploy a site into production with `DEBUG` turned on  | `true`    |
 | `ALLOWED_HOSTS` | List, splitted by comma, of host/domain that your application can serve               | `*`       |
-| `PROXY_SCRIPT_NAME` | If the app is running behind a proxy, this variable must be set with the proxy path | -      |
 
 
 #### Example
 ```
 DEBUG=True
 ALLOWED_HOSTS=www.example.com,.subdomain.com
-PROXY_SCRIPT_NAME=/api
 ```
 
 ## Database settings
-To know how configure databases in a Django application, see the [documentation](https://docs.djangoproject.com/en/2.2/ref/databases/)
+To know how configure databases in a Django application, see the [documentation](https://docs.djangoproject.com/en/3.2/ref/databases/)
 
 
 | Variable         | Description                                                                          | Default     |
@@ -144,15 +132,11 @@ DB_PASSWORD=a_password
 # Project structure                                                     
 
 ```
-[project_name]
+[ilova_backend]
 ├── docker
 │   ├── docker-compose.dev.yml
 │   └── Dockerfile
-├── environments
-│   ├── environment.dev.env
-│   ├── environment.prod.env
-│   └── environment.stage.env
-├── project
+├── ilova_backend
 │   ├── apps
 │   │   └── __init__.py
 │   ├── config
@@ -164,17 +148,15 @@ DB_PASSWORD=a_password
 │   ├── manage.py
 │   ├── static
 │   └── templates
-│       └── rest_framework
-│           └── api.html
+│   └── .env.example
+├── .gitignore
 ├── README.md
 └── requirements.txt
 ```
 
 The `docker/` directory is where are the configuration files needed to run the application with docker.
 
-The `environments/` contains `.env` samples for development, stage and production environments.
-
-The `project/` directory is the root of the actual Django project. All code files used by your application are inside this directory
+The `ilova_backend/` directory is the root of the actual Django project. All code files used by your application are inside this directory
 
 | File or directory       | Purpose       | 
 | ----------------------- | ------------- | 
