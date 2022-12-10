@@ -1,9 +1,9 @@
-from django.conf.urls import url
+from django.urls import path
 
-from .views import GenerateOTP, ValidateOTP, TestPermission
+from apps.accounts.views import GenerateOTP, ValidateOTP, TestPermission
 
 urlpatterns = [
-    url(r'^sms-send/$', GenerateOTP.as_view(), name="generate"),
-    url(r'^sms-verify/$', ValidateOTP.as_view(), name="validate"),
-    url(r'^test/$', TestPermission.as_view(), name="test"),
+    path('sms-send/', GenerateOTP.as_view(), name="generate"),
+    path('sms-verify/', ValidateOTP.as_view(), name="validate"),
+    path('test/', TestPermission.as_view(), name="test"),
 ]
