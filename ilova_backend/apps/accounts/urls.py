@@ -1,11 +1,9 @@
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from .views import send_sms_code
+from django.conf.urls import url
 
-# router = DefaultRouter()
-# router.register(r'register', UserRegisterViewSet, basename='register')
+from .views import GenerateOTP, ValidateOTP, TestPermission
 
 urlpatterns = [
-    # path('', include(router.urls)),
-    path('send_sms_code/', send_sms_code, name='send_sms_code'),
+    url(r'^sms-send/$', GenerateOTP.as_view(), name="generate"),
+    url(r'^sms-verify/$', ValidateOTP.as_view(), name="validate"),
+    url(r'^test/$', TestPermission.as_view(), name="test"),
 ]

@@ -1,75 +1,70 @@
+from __future__ import unicode_literals
+
 import datetime
-from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.utils import timezone
-from django.utils.translation import gettext as _
+import hashlib
+import os
+
 from django.conf import settings
-from django.utils.crypto import get_random_string
+from django.contrib.auth.models import AbstractUser
+from apps.accounts.managers.phone_number_user_manager import PhoneNumberUserManager
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
-from rest_framework.exceptions import NotAcceptable
-from core.validators import validate_number
+from eskiz_sms import EskizSMS
 
 
-class UserTypes(models.TextChoices):
-    ADMIN = "AD", "ADMIN"
-    USER = "US", "USER"
+eskiz = EskizSMS(
+            email=getattr(settings, 'ESKIZ_EMAIL', None),
+            password=getattr(settings, 'ESKIZ_PASSWORD', None),
+        )
 
 
-class CustomUser(AbstractUser):
-    username = PhoneNumberField(unique=True, validators=[validate_number])
-    user_type = models.CharField(max_length=2, choices=UserTypes.choices, default=UserTypes.USER)
-    email = models.EmailField(null=True, blank=True)
-    first_name = None
-    last_name = None
-    security_code = models.CharField(max_length=6)
-    is_verified = models.BooleanField(default=False)
-    sent = models.DateTimeField(null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    REQUIRED_FIELDS = []
+class PhoneNumberAbstactUser(AbstractUser):
+    phone_number = PhoneNumberField(unique=True)
+    objects = PhoneNumberUserManager()
+    REQUIRED_FIELDS = ['email', 'phone_number']
 
     class Meta:
-        ordering = ('-created_at', )
+        verbose_name = _('user')
+        verbose_name_plural = _('users')
+
+
+class PhoneToken(models.Model):
+    phone_number = PhoneNumberField(editable=False)
+    otp = models.CharField(max_length=40, editable=False)
+    timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+    attempts = models.IntegerField(default=0)
+    used = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = "OTP Token"
+        verbose_name_plural = "OTP Tokens"
 
     def __str__(self):
-        try:
-            return self.username.as_e164
-        except:
-            return self.username
+        return "{} - {}".format(self.phone_number, self.otp)
 
-    def generate_security_code(self):
-        """
-        Returns a unique random `security_code` for given `TOKEN_LENGTH` in the settings.
-        Default token length = 6
-        """
-        token_length = getattr(settings, "TOKEN_LENGTH", 6)
-        code = get_random_string(token_length, allowed_chars="0123456789")
-        return code
-
-    def is_security_code_expired(self):
-        expiration_date = self.sent() + datetime.timedelta(
-            minutes=settings.TOKEN_EXPIRE_MINUTES
-        )
-        return expiration_date <= timezone.now()
-
-    def send_confirmation(self):
-        self.security_code = self.generate_security_code()
-        self.sent = timezone.now
-
-        print(f'Sending security code {self.security_code} to phone {self.username}')
-        
-
-    def check_verification(self, security_code):
-        if (
-            not self.is_security_code_expired() and
-            security_code == self.security_code and
-            self.is_verified == False
-        ):
-            self.is_verified = True
-            self.save()
+    @classmethod
+    def create_otp_for_number(cls, number):
+        # The max otps generated for a number in a day are only 10.
+        # Any more than 10 attempts returns False for the day.
+        today_min = datetime.datetime.combine(datetime.date.today(), datetime.time.min)
+        today_max = datetime.datetime.combine(datetime.date.today(), datetime.time.max)
+        otps = cls.objects.filter(phone_number=number, timestamp__range=(today_min, today_max))
+        if otps.count() <= getattr(settings, 'PHONE_LOGIN_ATTEMPTS', 10):
+            otp = cls.generate_otp(length=getattr(settings, 'PHONE_LOGIN_OTP_LENGTH', 6))
+            phone_token = PhoneToken(phone_number=number, otp=otp)
+            phone_token.save()
+            message = f"Sizning bir martalik parolingiz: {otp}"
+            # eskiz.send_sms(str(number)[1:], message, from_whom='4546')
+            return phone_token
         else:
-            raise NotAcceptable(
-                _("Your security code is wrong, expired or this phone is verified before."))
+            return False
 
-        return self.is_verified
+    @classmethod
+    def generate_otp(cls, length=6):
+        hash_algorithm = getattr(settings, 'PHONE_LOGIN_OTP_HASH_ALGORITHM', 'sha256')
+        m = getattr(hashlib, hash_algorithm)()
+        m.update(getattr(settings, 'SECRET_KEY', None).encode('utf-8'))
+        m.update(os.urandom(16))
+        otp = str(int(m.hexdigest(), 16))[-length:]
+        return otp

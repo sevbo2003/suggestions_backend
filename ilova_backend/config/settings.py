@@ -42,9 +42,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'phonenumber_field',
+    'sendsms',
 
     # Local apps
-    'apps.accounts'
+    'apps.accounts.apps.AccountsConfig',
+    'apps.suggestions.apps.SuggestionsConfig',
 ]
 
 MIDDLEWARE = [
@@ -116,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = []
 # Internationalization
 # https://docs.djangoproject.com/en/0.1.0/topics/i18n/
 
-LANGUAGE_CODE = 'En-us'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
 
@@ -134,6 +136,8 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'staticfiles')]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # django-cors-headers
 # https://pypi.org/project/django-cors-headers/
@@ -157,13 +161,21 @@ CORS_ALLOW_METHODS = getenv(
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # 'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'core.paginations.CustomPagination',
     'PAGE_SIZE': 100,
 }
-AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTH_USER_MODEL = 'accounts.PhoneNumberAbstactUser'
+# AUTH_USER_MODEL = 'accounts.CustomUser'
+AUTHENTICATION_BACKENDS = (
+    'apps.accounts.backends.phone_backend.PhoneBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
 
 REST_USE_JWT = True
 JWT_AUTH_COOKIE = 'jwt-auth'
@@ -191,3 +203,14 @@ TOKEN_EXPIRE_MINUTES = 1
 APP_VERSION = '1.0.0'
 APP_NAME = 'Ilova API'
 APP_DESCRIPTION = 'A RESTfull API for project Ilova API'
+
+
+# Sms sending confs
+PHONE_LOGIN_ATTEMPTS = 10
+PHONE_LOGIN_OTP_LENGTH = 5
+PHONE_LOGIN_OTP_HASH_ALGORITHM = 'sha256'
+PHONE_LOGIN_DEBUG = True
+
+# Configure the ESKIZ (for eskiz_sms integration)
+ESKIZ_EMAIL = os.getenv('ESKIZ_EMAIL')
+ESKIZ_PASSWORD = os.getenv('ESKIZ_PASSWORD')
