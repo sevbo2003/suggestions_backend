@@ -23,6 +23,11 @@ class ProblemSerializer(serializers.ModelSerializer):
     
     def get_problem_types(self, obj):
         return ProblemTypeSerializer(obj.problem_types.all(), many=True).data
+    
+    def update(self, instance, validated_data):
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        return instance
 
 
 class CreateProblemSerializer(serializers.ModelSerializer):
