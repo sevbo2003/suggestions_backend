@@ -2,9 +2,10 @@ from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
-from apps.suggestions.models import ProblemType, Problem, Status
-from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerializer, CreateProblemSerializer
+from apps.suggestions.models import ProblemType, Problem, Status, Location
+from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerializer, CreateProblemSerializer, LocationSerializer
 from apps.suggestions.filters import ProblemFilter
+from core.geo_finder import get_location
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 
@@ -16,6 +17,27 @@ class ProblemTypeViewSets(viewsets.ModelViewSet):
     serializer_class = ProblemTypeSerializer
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'head', 'options']
+
+
+class LocationViewSet(viewsets.ModelViewSet):
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+        serializer = LocationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        lon = serializer.data['lon']
+        lat = serializer.data['lat']
+        city, district = get_location(str(lon), str(lat))
+        return Response({
+            "id": serializer.data['id'],
+            "lon": lon,
+            "lat": lat,
+            "city": city,
+            "district": district
+        }, status=status.HTTP_201_CREATED)
 
 
 class ProblemViewSets(viewsets.ModelViewSet):
