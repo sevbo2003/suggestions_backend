@@ -15,14 +15,13 @@ User = get_user_model()
 class ProblemTypeViewSets(viewsets.ModelViewSet):
     queryset = ProblemType.objects.all()
     serializer_class = ProblemTypeSerializer
-    permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'head', 'options']
 
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = LocationSerializer
-    permission_classes = [IsAuthenticated]
+    http_method_names = ['get', 'post', 'head', 'options']
 
     def create(self, request, *args, **kwargs):
         serializer = LocationSerializer(data=request.data)
@@ -43,7 +42,6 @@ class LocationViewSet(viewsets.ModelViewSet):
 class ProblemViewSets(viewsets.ModelViewSet):
     queryset = Problem.objects.all()
     serializer_class = ProblemSerializer
-    permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'post', 'patch', 'delete', 'head', 'options']
     filterset_class = ProblemFilter
 

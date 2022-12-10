@@ -17,7 +17,7 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'ilova_backend_4.1.0_0.1.0')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG', type=bool, default=True)
 
-ALLOWED_HOSTS = getenv('ALLOWED_HOSTS', type=list, default=[])
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
 
 # If the app is running behind a proxy, this variable must be set with the proxy path
 # See https://docs.djangoproject.com/en/0.1.0/ref/settings/#force-script-name
@@ -112,7 +112,20 @@ if os.environ.get('DB_ENGINE') == 'oracle':
 # Password validation
 # https://docs.djangoproject.com/en/0.1.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 
 
 # Internationalization
@@ -120,7 +133,7 @@ AUTH_PASSWORD_VALIDATORS = []
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = os.getenv('TIME_ZONE', 'UTC')
+TIME_ZONE = os.getenv('TIME_ZONE', 'Asia/Tashkent')
 
 USE_I18N = True
 
@@ -144,6 +157,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ORIGIN_ALLOW_ALL = getenv('CORS_ORIGIN_ALLOW_ALL', type=bool, default=True)
 CORS_ORIGIN_WHITELIST = getenv('CORS_ORIGIN_WHITELIST', type=list, default=[])
+print(CORS_ORIGIN_WHITELIST)
 CORS_ORIGIN_REGEX_WHITELIST = [
     '%r' % value
     for value in getenv('CORS_ORIGIN_REGEX_WHITELIST', type=list, default=[])
@@ -168,7 +182,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'core.paginations.CustomPagination',
-    'PAGE_SIZE': 100,
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
+    'PAGE_SIZE': 10,
 }
 AUTH_USER_MODEL = 'accounts.PhoneNumberAbstactUser'
 # AUTH_USER_MODEL = 'accounts.CustomUser'
@@ -193,7 +208,7 @@ SIMPLE_JWT = {
 PHONENUMBER_DEFAULT_REGION = 'UZ'
 
 # Token length for OTP
-TOKEN_LENGTH = 6
+TOKEN_LENGTH = 5
 
 # Token expiry
 TOKEN_EXPIRE_MINUTES = 1
@@ -209,7 +224,7 @@ APP_DESCRIPTION = 'A RESTfull API for project Ilova API'
 PHONE_LOGIN_ATTEMPTS = 10
 PHONE_LOGIN_OTP_LENGTH = 5
 PHONE_LOGIN_OTP_HASH_ALGORITHM = 'sha256'
-PHONE_LOGIN_DEBUG = True
+PHONE_LOGIN_DEBUG = getenv('PHONE_LOGIN_DEBUG', type=bool, default=False)
 
 # Configure the ESKIZ (for eskiz_sms integration)
 ESKIZ_EMAIL = os.getenv('ESKIZ_EMAIL')
