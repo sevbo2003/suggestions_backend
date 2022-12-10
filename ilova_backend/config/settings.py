@@ -157,7 +157,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ORIGIN_ALLOW_ALL = getenv('CORS_ORIGIN_ALLOW_ALL', type=bool, default=True)
 CORS_ORIGIN_WHITELIST = getenv('CORS_ORIGIN_WHITELIST', type=list, default=[])
-print(CORS_ORIGIN_WHITELIST)
 CORS_ORIGIN_REGEX_WHITELIST = [
     '%r' % value
     for value in getenv('CORS_ORIGIN_REGEX_WHITELIST', type=list, default=[])
@@ -182,7 +181,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
     'DEFAULT_PAGINATION_CLASS': 'core.paginations.CustomPagination',
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticated',),
     'PAGE_SIZE': 10,
 }
 AUTH_USER_MODEL = 'accounts.PhoneNumberAbstactUser'
