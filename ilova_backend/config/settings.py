@@ -75,6 +75,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.application_info',
+                'core.context_processors.site',
             ]
         },
     }
@@ -227,3 +228,6 @@ PHONE_LOGIN_DEBUG = getenv('PHONE_LOGIN_DEBUG', type=bool, default=False)
 # Configure the ESKIZ (for eskiz_sms integration)
 ESKIZ_EMAIL = os.getenv('ESKIZ_EMAIL')
 ESKIZ_PASSWORD = os.getenv('ESKIZ_PASSWORD')
+
+# Domain name
+SITE_URL = getenv('SITE_URL', default='http://127.0.0.1:8000')
