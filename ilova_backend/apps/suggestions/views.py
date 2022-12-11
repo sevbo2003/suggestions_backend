@@ -6,8 +6,10 @@ from apps.suggestions.models import ProblemType, Problem, Status, Location
 from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerializer, CreateProblemSerializer, LocationSerializer
 from apps.suggestions.filters import ProblemFilter
 from core.geo_finder import get_location
+from core.last_day_of_month import last_day_of_month
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
+import datetime
 
 User = get_user_model()
 
@@ -91,6 +93,36 @@ class ProblemViewSets(viewsets.ModelViewSet):
             if count != 0:
                 result.append({i: count})
         return Response(result, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'])
+    def graph(self, request):
+        if request.query_params.get('monthly'):
+            if request.query_params.get('monthly') == 'true':
+                month_list = ['Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun', 'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr']
+                result = []
+                for i in month_list:
+                    count = self.get_queryset().filter(date__month=month_list.index(i)+1).count()
+                    result.append({i: {
+                        "all": count,
+                        "solved": self.get_queryset().filter(date__month=month_list.index(i)+1, status=Status.SOLVED).count(),
+                        "pending": self.get_queryset().filter(date__month=month_list.index(i)+1, status=Status.PENDING).count(),
+                        "fake": self.get_queryset().filter(date__month=month_list.index(i)+1, status=Status.FAKE).count()
+                    }})
+                return Response(result, status=status.HTTP_200_OK)
+        if request.query_params.get('daily'):
+            if request.query_params.get('daily') == 'true':
+                result = []
+                max_day_in_month = last_day_of_month(datetime.date.today()).month
+                for i in range(1, max_day_in_month + 1):
+                    count = self.get_queryset().filter(date__day=i).count()
+                    result.append({i: {
+                        "all": count,
+                        "solved": self.get_queryset().filter(date__day=i, status=Status.SOLVED).count(),
+                        "pending": self.get_queryset().filter(date__day=i, status=Status.PENDING).count(),
+                        "fake": self.get_queryset().filter(date__day=i, status=Status.FAKE).count()
+                    }})
+                return Response(result, status=status.HTTP_200_OK)
+        return Response({"detail": "Filter parametr is required"}, status=status.HTTP_400_BAD_REQUEST)
 
     def destroy(self, request, *args, **kwargs):
         problem = self.get_object()
