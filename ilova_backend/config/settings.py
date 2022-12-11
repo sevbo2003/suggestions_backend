@@ -42,11 +42,12 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'phonenumber_field',
-    'sendsms',
+    'channels',
 
     # Local apps
     'apps.accounts.apps.AccountsConfig',
     'apps.suggestions.apps.SuggestionsConfig',
+    'apps.chat.apps.ChatConfig'
 ]
 
 MIDDLEWARE = [
@@ -231,3 +232,14 @@ ESKIZ_PASSWORD = os.getenv('ESKIZ_PASSWORD')
 
 # Domain name
 SITE_URL = getenv('SITE_URL', default='http://127.0.0.1:8000')
+
+# Redis
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [os.getenv('REDIS_URL')],
+        },
+    },
+}
+print(os.getenv('REDIS_URL'))
