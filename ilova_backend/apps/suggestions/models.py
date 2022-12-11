@@ -35,7 +35,6 @@ class Problem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_problems")
     city = models.CharField(max_length=100, null=True, blank=True)
     district = models.CharField(max_length=100, null=True, blank=True)
-    images = models.FileField(upload_to="%Y/%m/%d/")
     date = models.DateTimeField(auto_now_add=True)
     problem_types = models.ManyToManyField(ProblemType, related_name="problems")
     description = models.CharField(max_length=1000)
@@ -53,3 +52,12 @@ class Problem(models.Model):
     def save(self, *args, **kwargs):
         self.city, self.district = get_location(str(self.location.lon), str(self.location.lat))
         super().save(*args, **kwargs)
+
+
+class ProblemImages(models.Model):
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="problems")
+    
+    class Meta:
+        verbose_name = "Ariza rasmi"
+        verbose_name_plural = "Ariza rasmlari"
