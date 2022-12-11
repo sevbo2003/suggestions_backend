@@ -3,6 +3,10 @@ from django.conf import settings
 from .loader import get_revison
 
 
+def site(request):
+    return {'SITE_URL': settings.SITE_URL}
+
+
 def application_info(request):
     """
     Context processor to return application informations
