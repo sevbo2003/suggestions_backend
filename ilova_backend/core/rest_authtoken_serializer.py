@@ -30,7 +30,7 @@ class AuthTokenSerializer(serializers.Serializer):
                 username = PhoneNumberAbstactUser.objects.get(phone_number=phone_number).username
             except:
                 msg = _('Unable to log in with provided credentials.')
-                raise serializers.ValidationError(msg, code='authorization')
+                raise serializers.ValidationError("Error")
             user = authenticate(request=self.context.get('request'),
                                     username = username, password=password)
 
