@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.schemas import ManualSchema
 from rest_framework.schemas import coreapi as coreapi_schema
 from rest_framework.views import APIView
+from rest_framework.status import HTTP_400_BAD_REQUEST
 
 
 class ObtainAuthToken(APIView):
@@ -57,7 +58,7 @@ class ObtainAuthToken(APIView):
             user = serializer.validated_data['user']
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
-        return Response({"message": "Phone or password is incorrect"})
+        return Response({"message": "Phone or password is incorrect"}, status=HTTP_400_BAD_REQUEST)
 
 
 obtain_auth_token = ObtainAuthToken.as_view()
