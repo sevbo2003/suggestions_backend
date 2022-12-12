@@ -26,8 +26,13 @@ class AuthTokenSerializer(serializers.Serializer):
         password = attrs.get('password')
 
         if phone_number and password:
+            try:
+                username = PhoneNumberAbstactUser.objects.get(phone_number=phone_number).username
+            except:
+                msg = _('Unable to log in with provided credentials.')
+                raise serializers.ValidationError(msg, code='authorization')
             user = authenticate(request=self.context.get('request'),
-                                username=PhoneNumberAbstactUser.objects.get(phone_number=phone_number).username, password=password)
+                                    username = username, password=password)
 
             # The authenticate call simply returns None for is_active=False
             # users. (Assuming the default ModelBackend authentication
