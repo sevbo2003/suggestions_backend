@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Third party apps
+    'channels',
     'corsheaders',
     'django_extensions',
     'django_filters',
@@ -42,7 +43,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'phonenumber_field',
-    'channels',
 
     # Local apps
     'apps.accounts.apps.AccountsConfig',
@@ -83,6 +83,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.routing.application'
 
 
 # Database
@@ -193,7 +194,6 @@ AUTHENTICATION_BACKENDS = (
 )
 
 REST_USE_JWT = True
-JWT_AUTH_COOKIE = 'jwt-auth'
 
 
 SIMPLE_JWT = {
@@ -242,4 +242,3 @@ CHANNEL_LAYERS = {
         },
     },
 }
-print(os.getenv('REDIS_URL'))
