@@ -57,7 +57,7 @@ class ObtainAuthToken(APIView):
             user = serializer.validated_data['user']
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key})
-        return Response({"message": "Phone or password is incorrect"}, status=400)
+        return Response({"message": "Phone or password is incorrect"})
 
 
 obtain_auth_token = ObtainAuthToken.as_view()
