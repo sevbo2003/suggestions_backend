@@ -83,7 +83,17 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
-ASGI_APPLICATION = 'config.routing.application'
+ASGI_APPLICATION = 'config.asgi.application'
+
+# Redis
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -232,13 +242,3 @@ ESKIZ_PASSWORD = os.getenv('ESKIZ_PASSWORD')
 
 # Domain name
 SITE_URL = getenv('SITE_URL', default='http://127.0.0.1:8000')
-
-# Redis
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [os.getenv('REDIS_URL')],
-        },
-    },
-}
