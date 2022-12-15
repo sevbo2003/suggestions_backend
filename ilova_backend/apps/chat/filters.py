@@ -6,7 +6,7 @@ class MessageFilter(filters.FilterSet):
     class Meta:
         model = Message
         fields = {
-            'from_problem_user': ['exact'],
+            'chat_problem': ['exact'],
             'is_read': ['exact'],
         }
     
