@@ -1,20 +1,15 @@
 from rest_framework import serializers
 from apps.chat.models import Message, ChatProblem
+from apps.suggestions.serializers import ProblemSerializer
 
 
 class ChatProblemSerializer(serializers.ModelSerializer):
-    problem = serializers.SerializerMethodField()
+    problem = ProblemSerializer()
 
     class Meta:
         model = ChatProblem
         fields = ('id', 'problem', 'created_at')
         read_only_fields = ('created_at',)
-    
-    def get_problem(self, obj):
-        return {
-            'id': obj.problem.id,
-            'title': obj.problem.city + ' ' + obj.problem.district
-        }
     
     def create(self, validated_data):
         problem = validated_data.pop('problem')
