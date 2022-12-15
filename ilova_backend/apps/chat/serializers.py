@@ -8,8 +8,8 @@ class ChatProblemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ChatProblem
-        fields = ('id', 'problem', 'created_at')
-        read_only_fields = ('created_at',)
+        fields = ('id', 'problem', 'last_message', 'created_at')
+        read_only_fields = ('last_message', 'created_at')
     
     def create(self, validated_data):
         problem = validated_data.pop('problem')
@@ -22,7 +22,7 @@ class ChatProblemSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
-        fields = ('id', 'chat_problem', 'message', 'is_read', 'date')
+        fields = ('id', 'chat_problem', 'message', 'sender', 'is_read', 'date')
     
     def create(self, validated_data):
         message = Message.objects.create(**validated_data)
