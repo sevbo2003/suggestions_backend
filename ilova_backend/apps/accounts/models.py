@@ -28,6 +28,9 @@ class PhoneNumberAbstactUser(AbstractUser):
         verbose_name = _('user')
         verbose_name_plural = _('users')
 
+    def __str__(self):
+        return self.phone_number.as_e164
+
 
 class PhoneToken(models.Model):
     phone_number = PhoneNumberField(editable=False)
