@@ -38,4 +38,13 @@ class Message(models.Model):
     
     class Meta:
         ordering = ('-date',)
-        
+    
+
+class MessageFile(models.Model):
+    file = models.FileField(upload_to='files/messages')
+
+    def __str__(self):
+        return self.file.name
+    
+    def get_url(self):
+        return self.file.url

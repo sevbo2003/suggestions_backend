@@ -1,6 +1,7 @@
 from rest_framework import serializers
-from apps.chat.models import Message, ChatProblem
+from apps.chat.models import Message, ChatProblem, MessageFile
 from apps.suggestions.serializers import ProblemSerializer
+from django.conf import settings
 
 
 class ChatProblemSerializer(serializers.ModelSerializer):
@@ -33,4 +34,18 @@ class MessageSerializer(serializers.ModelSerializer):
         instance.is_read = validated_data.get('is_read', instance.is_read)
         instance.save()
         return instance
+    
+
+class MessageFileSerializer(serializers.ModelSerializer):
+    file_link = serializers.SerializerMethodField()
+    file = serializers.FileField(allow_empty_file = False, use_url = False, write_only=True
+    )
+
+    class Meta:
+        model = MessageFile
+        fields = ('id', 'file', 'file_link')
+        read_only_fields = ('file_link',)
+    
+    def get_file_link(self, obj):
+        return settings.SITE_URL + obj.file.url
     
