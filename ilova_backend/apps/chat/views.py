@@ -15,7 +15,7 @@ class ChatViewSet(ModelViewSet):
     queryset = ChatProblem.objects.all()
     serializer_class = ChatProblemSerializer
     permission_classes = [IsOwberOrReadOnly, IsAuthenticated]
-    # filterset_class = MessageFilter
+    http_method_names = ['get', 'post', 'head', 'options', 'delete']
 
     def get_queryset(self):
         if self.request.user.is_superuser:
@@ -44,6 +44,14 @@ class ChatViewSet(ModelViewSet):
                 serializer = ChatProblemSerializer(chat_problem)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response({"message": "You don't have permission to do this operation"}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.problem.user == request.user or request.user.is_superuser:
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=['get'])
     def get_read_messages(self, request, pk=None):
