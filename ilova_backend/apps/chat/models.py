@@ -29,6 +29,7 @@ class ChatProblem(models.Model):
 class Message(models.Model):
     chat_problem = models.ForeignKey(ChatProblem, on_delete=models.CASCADE, related_name='messages')
     message = models.CharField(max_length=1000)
+    file = models.FileField(upload_to='files/messages', blank=True, null=True)
     sender = models.CharField(max_length=10, choices=SenderType.choices)
     is_read = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)

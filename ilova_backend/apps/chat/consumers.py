@@ -4,7 +4,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 
 from apps.chat.models import Message, ChatProblem, SenderType
+from apps.chat.serializers import MessageSerializer
 from apps.suggestions.models import Problem
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -33,6 +35,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
+        file = text_data_json['file'] if 'file' in text_data_json else None
         user = self.scope.get('user', False)
         is_read = False
         chat_id = self.chat_id
@@ -41,18 +44,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
         else:
             sender = 'user'
         if user.is_authenticated:
-            await self.save_message(message, chat_id, sender)
+            reuturn_message = await self.main_message_owerride_func(message, chat_id, sender, file)
             await self.channel_layer.group_send(
                 self.chat_id_name,
                 {
                     'type': 'chat_message',
-                    'message': message,
-                    'user': user.username,
-                    'is_read': is_read,
-                    'chat_id': int(chat_id),
-                    'sender': sender
+                    'message': reuturn_message,
                 }
             )
+        
+    def main_message_owerride_func(self, message, chat_id, sender, file):
+        if file:
+            return self.save_media_message(message, chat_id, sender, file)
+        return self.save_message(message, chat_id, sender, file)
 
     @sync_to_async
     def get_chat(self, chat_id):
@@ -72,27 +76,45 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return chat
 
     async def chat_message(self, event):
-        message = event['message']
-        user = event['user']
-        is_read = event['is_read']
-        chat_id = event['chat_id']
-        sender = event['sender']
-        await self.send(text_data=json.dumps({
-            'message': message,
-            'user': user,
-            'is_read': is_read,
-            'chat_id': chat_id,
-            'sender': sender
-        }))
-    
+        print(event)
+        await self.send(text_data=json.dumps(event['message']))
+
+    # @sync_to_async
+    # def send_media_message(self, message, chat_id, sender, file):
+    #     try:
+    #         chat = ChatProblem.objects.get(id=chat_id)
+    #     except ChatProblem.DoesNotExist:
+    #         chat = ChatProblem.objects.create(problem_id=chat_id)
+    #     Message.objects.create(
+    #         message=message,
+    #         chat_problem=chat,
+    #         sender=SenderType[sender.upper()],
+    #         file=file
+    #     )
+
     @sync_to_async
-    def save_message(self, message, chat_id, sender):
+    def save_message(self, message, chat_id, sender, file):
         try:
             chat = ChatProblem.objects.get(id=chat_id)
         except ChatProblem.DoesNotExist:
             chat = ChatProblem.objects.create(problem_id=chat_id)
-        Message.objects.create(
+        message = Message.objects.create(
             message=message,
             chat_problem=chat,
-            sender=SenderType[sender.upper()]
+            sender=SenderType[sender.upper()],
         )
+        return MessageSerializer(message).data
+    
+    @sync_to_async
+    def save_media_message(self, message, chat_id, sender, file):
+        try:
+            chat = ChatProblem.objects.get(id=chat_id)
+        except ChatProblem.DoesNotExist:
+            chat = ChatProblem.objects.create(problem_id=chat_id)
+        message = Message.objects.create(
+            message=message,
+            chat_problem=chat,
+            sender=SenderType[sender.upper()],
+            file=file
+        )
+        return MessageSerializer(message).data

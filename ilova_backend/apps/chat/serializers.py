@@ -21,9 +21,16 @@ class ChatProblemSerializer(serializers.ModelSerializer):
 
 
 class MessageSerializer(serializers.ModelSerializer):
+    file_link = serializers.SerializerMethodField()
+    file = serializers.FileField(allow_empty_file = True, use_url = False, write_only=True)
+
     class Meta:
         model = Message
-        fields = ('id', 'chat_problem', 'message', 'sender', 'is_read', 'date')
+        fields = ('id', 'chat_problem', 'message','file','file_link', 'sender', 'is_read', 'date')
+        read_only_fields = ('date', 'file_link')
+    
+    def get_file_link(self, obj):
+        return settings.SITE_URL + obj.file.url if obj.file else None
     
     def create(self, validated_data):
         message = Message.objects.create(**validated_data)
