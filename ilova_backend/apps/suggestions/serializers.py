@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.suggestions.models import ProblemType, Problem, Location, ProblemImages
+from apps.notification.serializers import MahallaSerializer
 from core.geo_finder import get_location
 from django.contrib.auth import get_user_model
 from django.conf import settings
@@ -30,10 +31,11 @@ class ProblemSerializer(serializers.ModelSerializer):
     problem_types = serializers.SerializerMethodField()
     location = LocationSerializer()
     images = serializers.SerializerMethodField()
+    mahalla = MahallaSerializer()
 
     class Meta:
         model = Problem
-        fields = ['id', 'user', 'city', 'district', 'date', 'problem_types', 'images', 'description', 'status', 'location']
+        fields = ['id', 'user', 'city', 'district', 'date', 'problem_types', 'images', 'description', 'status', 'location', 'mahalla']
         read_only_fields = ['id','user', 'city', 'district', 'date']
     
     def get_problem_types(self, obj):
@@ -54,7 +56,7 @@ class CreateProblemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Problem
-        fields = ['id', 'user', 'city', 'district', 'date', 'problem_types', 'images','uploaded_images', 'description', 'status', 'location']
+        fields = ['id', 'user', 'city', 'district', 'date', 'problem_types', 'images','uploaded_images', 'description', 'status', 'location', 'mahalla']
         read_only_fields = ['id','user', 'city', 'district', 'date', 'status']
     
     def get_images(self, obj):
@@ -64,6 +66,11 @@ class CreateProblemSerializer(serializers.ModelSerializer):
         problem_types = validated_data.pop('problem_types')
         uploaded_data = validated_data.pop('uploaded_images')
         validated_data['city'], validated_data['district'] = get_location(str(validated_data['location'].lon), str(validated_data['location'].lat))
+        mahalla = validated_data['mahalla']
+        if mahalla is not None:
+            user = self.context['request'].user
+            user.mahallalar.add(mahalla)
+            user.save()
         problem = Problem.objects.create(**validated_data)
         for problem_type in problem_types:
             problem.problem_types.add(problem_type)
