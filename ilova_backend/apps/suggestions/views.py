@@ -7,6 +7,7 @@ from apps.suggestions.serializers import ProblemTypeSerializer, ProblemSerialize
 from apps.suggestions.filters import ProblemFilter
 from core.geo_finder import get_location
 from core.last_day_of_month import last_day_of_month
+from core.count_percent import count_percent
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import get_user_model
 import datetime
@@ -54,12 +55,69 @@ class ProblemViewSets(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def statistics(self, request):
+        all_today = self.get_queryset().filter(date__date=datetime.date.today()).count()
+        all_this_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1]).count()
+        all_this_month = self.get_queryset().filter(date__month=datetime.date.today().month).count()
+        all_yesterday = self.get_queryset().filter(date__date=datetime.date.today() - datetime.timedelta(days=1)).count()
+        all_last_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1] - 1).count()
+        all_last_month = self.get_queryset().filter(date__month=datetime.date.today().month - 1).count()
+        solved_today = self.get_queryset().filter(date__date=datetime.date.today(), status=Status.SOLVED).count()
+        solved_this_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1], status=Status.SOLVED).count()
+        solved_this_month = self.get_queryset().filter(date__month=datetime.date.today().month, status=Status.SOLVED).count()
+        solved_yesterday = self.get_queryset().filter(date__date=datetime.date.today() - datetime.timedelta(days=1), status=Status.SOLVED).count()
+        solved_last_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1] - 1, status=Status.SOLVED).count()
+        solved_last_month = self.get_queryset().filter(date__month=datetime.date.today().month - 1, status=Status.SOLVED).count()
+        pending_today = self.get_queryset().filter(date__date=datetime.date.today(), status=Status.PENDING).count()
+        pending_this_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1], status=Status.PENDING).count()
+        pending_this_month = self.get_queryset().filter(date__month=datetime.date.today().month, status=Status.PENDING).count()
+        pending_yesterday = self.get_queryset().filter(date__date=datetime.date.today() - datetime.timedelta(days=1), status=Status.PENDING).count()
+        pending_last_week = self.get_queryset().filter(date__week=datetime.date.today().isocalendar()[1] - 1, status=Status.PENDING).count()
+        pending_last_month = self.get_queryset().filter(date__month=datetime.date.today().month - 1, status=Status.PENDING).count()
+        all_today_yesterday_percent = count_percent(all_today, all_yesterday)
+        all_this_week_last_week_percent = count_percent(all_this_week, all_last_week)
+        all_this_month_last_month_percent = count_percent(all_this_month, all_last_month)
+        solved_today_yesterday_percent = count_percent(solved_today, solved_yesterday)
+        solved_this_week_last_week_percent = count_percent(solved_this_week, solved_last_week)
+        solved_this_month_last_month_percent = count_percent(solved_this_month, solved_last_month)
+        pending_today_yesterday_percent = count_percent(pending_today, pending_yesterday)
+        pending_this_week_last_week_percent = count_percent(pending_this_week, pending_last_week)
+        pending_this_month_last_month_percent = count_percent(pending_this_month, pending_last_month)
+
         return Response({
-            "all": self.get_queryset().count(),
-            "solved": self.get_queryset().filter(status=Status.SOLVED).count(),
-            "pending": self.get_queryset().filter(status=Status.PENDING).count(),
-            "fake": self.get_queryset().filter(status=Status.FAKE).count()
-        })
+            "all": {
+                "today": all_today,
+                "this_week": all_this_week,
+                "this_month": all_this_month,
+                "yesterday": all_yesterday,
+                "last_week": all_last_week,
+                "last_month": all_last_month,
+                "today_yesterday_percent": all_today_yesterday_percent,
+                "this_week_last_week_percent": all_this_week_last_week_percent,
+                "this_month_last_month_percent": all_this_month_last_month_percent
+            },
+            "solved": {
+                "today": solved_today,
+                "this_week": solved_this_week,
+                "this_month": solved_this_month,
+                "yesterday": solved_yesterday,
+                "last_week": solved_last_week,
+                "last_month": solved_last_month,
+                "today_yesterday_percent": solved_today_yesterday_percent,
+                "this_week_last_week_percent": solved_this_week_last_week_percent,
+                "this_month_last_month_percent": solved_this_month_last_month_percent
+            },
+            "pending": {
+                "today": pending_today,
+                "this_week": pending_this_week,
+                "this_month": pending_this_month,
+                "yesterday": pending_yesterday,
+                "last_week": pending_last_week,
+                "last_month": pending_last_month,
+                "today_yesterday_percent": pending_today_yesterday_percent,
+                "this_week_last_week_percent": pending_this_week_last_week_percent,
+                "this_month_last_month_percent": pending_this_month_last_month_percent
+                }
+            })
     
     @action(detail=False, methods=['get'])
     def count_problems_by_city(self, request):
