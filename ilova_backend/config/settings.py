@@ -47,7 +47,8 @@ INSTALLED_APPS = [
     # Local apps
     'apps.accounts.apps.AccountsConfig',
     'apps.suggestions.apps.SuggestionsConfig',
-    'apps.chat.apps.ChatConfig'
+    'apps.chat.apps.ChatConfig',
+    'apps.notification.apps.NotificationConfig',
 ]
 
 MIDDLEWARE = [
