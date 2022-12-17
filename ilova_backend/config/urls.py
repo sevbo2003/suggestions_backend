@@ -20,6 +20,7 @@ urlpatterns = [
     path('api/v1/users/', include('apps.accounts.urls')),
     path('api/v1/suggestions/', include('apps.suggestions.urls')),
     path('api/v1/chat/', include('apps.chat.urls')),
+    path('api/v1/notification/', include('apps.notification.urls')),
     path('api/v1/auth/token/', obtain_auth_token, name='api_token_auth'),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='redoc'),
