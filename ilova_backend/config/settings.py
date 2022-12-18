@@ -17,7 +17,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'ilova_backend_4.1.0_0.1.0')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = getenv('DEBUG', type=bool, default=True)
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+# ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',')
+ALLOWED_HOSTS = ['*']
 
 # If the app is running behind a proxy, this variable must be set with the proxy path
 # See https://docs.djangoproject.com/en/0.1.0/ref/settings/#force-script-name
@@ -95,6 +96,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Celery
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
 
 
 # Database
