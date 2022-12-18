@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from apps.notification.models import Mahalla, Notification
+from django.conf import settings
 
 
 class MahallaSerializer(serializers.ModelSerializer):
@@ -10,17 +11,41 @@ class MahallaSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     mahalla = MahallaSerializer(many=True)
+    image_link = serializers.SerializerMethodField()
+    image = serializers.ImageField(write_only=True, required=False)
 
     class Meta:
         model = Notification
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'image', 'image_link', 'mahalla', 'date']
+        read_only_fields = ('image_link',)
+    
+    def get_image_link(self, obj):
+        return settings.SITE_URL + obj.image.url if obj.image else None
+        
+
+class NotificationCreateSerializer(serializers.ModelSerializer):
+    image_link = serializers.SerializerMethodField()
+    image = serializers.ImageField(write_only=True, required=False)
+
+    class Meta:
+        model = Notification
+        fields = ['id', 'title', 'description', 'image', 'image_link', 'mahalla', 'date']
+        read_only_fields = ('image_link',)
+    
+    def get_image_link(self, obj):
+        return settings.SITE_URL + obj.image.url if obj.image else None
+        
     
     def create(self, validated_data):
-        mahalla_data = validated_data.pop('mahalla')
-        notification = Notification.objects.create(**validated_data)
-        for mahalla in mahalla_data:
-            Mahalla.objects.create(notification=notification, **mahalla)
-        return notification
+        user =  self.context['request'].user
+        print("came here")
+        if user.is_superuser:
+            mahalla_data = validated_data.pop('mahalla')
+            notification = Notification.objects.create(**validated_data)
+            for mahalla in mahalla_data:
+                notification.mahalla.add(mahalla)
+            return notification
+        return serializers.ValidationError("Only admins can perform this operations")
     
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
