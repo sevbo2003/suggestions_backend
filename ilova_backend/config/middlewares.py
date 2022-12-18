@@ -41,10 +41,8 @@ class JWTAuthMiddleware:
 
         close_old_connections()
         query_string = scope['query_string'].decode()
-        print(query_string)
         try:
             if 'token' in query_string:
-                print("Came here")
                 token_key = query_string.split('=')[1]
                 if token_key == 'null':
                     user = AnonymousUser()
