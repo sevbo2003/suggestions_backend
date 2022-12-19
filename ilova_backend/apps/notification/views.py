@@ -1,7 +1,9 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions
+from rest_framework.response import Response
+from rest_framework.status import HTTP_200_OK
 from apps.notification.models import Notification
-from apps.notification.serializers import NotificationSerializer
+from apps.notification.serializers import NotificationSerializer, NotificationCreateSerializer
 
 
 class NotificationViewSet(ModelViewSet):
@@ -12,4 +14,11 @@ class NotificationViewSet(ModelViewSet):
     def get_queryset(self):
         if self.request.user.is_superuser:
             return self.queryset
-        return self.queryset.filter(mahalla__mahalla=self.request.user.mahalla)
+        mahallalar = self.request.user.mahallalar.all()
+        return self.queryset.filter(mahalla__in=mahallalar)
+    
+
+    def get_serializer_class(self):
+        if self.request.method in ['POST', 'PATCH', 'PUT']:
+            return NotificationCreateSerializer
+        return super().get_serializer_class()

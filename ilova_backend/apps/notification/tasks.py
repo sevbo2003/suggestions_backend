@@ -7,8 +7,7 @@ from channels.layers import get_channel_layer
 channel_layer = get_channel_layer()
 
 @shared_task
-def add(group_name, message):
-    # send to channel layer group
+def send_notification(group_name, message):
     async_to_sync(channel_layer.group_send)(
         group_name,
         {

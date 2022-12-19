@@ -2,8 +2,6 @@ from rest_framework import serializers
 from apps.notification.models import Mahalla, Notification
 from django.conf import settings
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 from apps.notification.tasks import send_notification
 
 
