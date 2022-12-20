@@ -23,3 +23,18 @@ class Notification(models.Model):
         ordering = ['-date']
         verbose_name_plural = "Xabarnomalar"
         verbose_name = "Xabarnoma"
+
+
+class UserNotification(models.Model):
+    user = models.ForeignKey('accounts.PhoneNumberAbstactUser', on_delete=models.CASCADE, related_name='notification')
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='user_notification')
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.username + " " + self.notification.title
+
+    class Meta:
+        verbose_name_plural = "Foydalanuvchi xabarnomalari"
+        verbose_name = "Foydalanuvchi xabarnomasi"
+        ordering = ['-created_at']
