@@ -9,7 +9,7 @@ class PhoneNumberAbstactUserAdmin(admin.ModelAdmin):
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups')
     readonly_fields = ('last_login', 'date_joined')
     fieldsets = (
-        (None, {'fields': ('username', 'email', 'phone_number', 'password')}),
+        (None, {'fields': ('username', 'email', 'phone_number', 'password', 'mahallalar')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
                                    'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),

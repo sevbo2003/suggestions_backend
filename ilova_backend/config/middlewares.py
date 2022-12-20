@@ -40,18 +40,13 @@ class JWTAuthMiddleware:
     async def __call__(self, scope, receive, send):
 
         close_old_connections()
-        headers = dict(scope['headers'])
+        query_string = scope['query_string'].decode()
         try:
-            if b'authorization' in headers:
-                auth_header = headers[b'authorization'].decode().split()
-                if len(auth_header) != 2:
+            if 'token' in query_string:
+                token_key = query_string.split('=')[1]
+                if token_key == 'null':
                     user = AnonymousUser()
-                    user.add_error('Invalid token header: no credentials provided!')
-                    scope['user'] = user
-                token_name, token_key = auth_header
-                if token_name.lower() != 'token':
-                    user = AnonymousUser()
-                    user.add_error('Invalid token header: no credentials provided!')
+                    user.add_error('Token Invalid')
                     scope['user'] = user
                 else:
                     try:

@@ -7,6 +7,7 @@ import os
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from apps.accounts.managers.phone_number_user_manager import PhoneNumberUserManager
+from apps.notification.models import Mahalla
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from phonenumber_field.modelfields import PhoneNumberField
@@ -23,6 +24,7 @@ class PhoneNumberAbstactUser(AbstractUser):
     phone_number = PhoneNumberField(unique=True)
     objects = PhoneNumberUserManager()
     REQUIRED_FIELDS = ['email', 'phone_number']
+    mahallalar = models.ManyToManyField(Mahalla, related_name='users',null=True, blank=True)
 
     class Meta:
         verbose_name = _('user')

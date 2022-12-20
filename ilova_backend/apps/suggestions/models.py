@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from shortuuid.django_fields import ShortUUIDField, ShortUUID
 from core.geo_finder import get_location
+from apps.notification.models import Mahalla
 
 User = get_user_model()
 
@@ -35,6 +35,7 @@ class Problem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_problems")
     city = models.CharField(max_length=100, null=True, blank=True)
     district = models.CharField(max_length=100, null=True, blank=True)
+    mahalla = models.ForeignKey(Mahalla, on_delete=models.CASCADE, related_name="problems", null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
     problem_types = models.ManyToManyField(ProblemType, related_name="problems")
     description = models.CharField(max_length=1000)

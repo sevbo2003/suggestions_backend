@@ -17,7 +17,6 @@ class GenerateOTP(CreateAPIView):
     serializer_class = PhoneTokenCreateSerializer
 
     def post(self, request, format=None):
-        # Get the patient if present or result None.
         ser = self.serializer_class(
             data=request.data,
             context={'request': request}
@@ -59,7 +58,6 @@ class ValidateOTP(CreateAPIView):
                     last_login = user.last_login
                 login(request, user)
                 response = user_detail(user, last_login)
-                print(response)
                 return Response(response, status=status.HTTP_200_OK)
             except ObjectDoesNotExist:
                 return Response(
