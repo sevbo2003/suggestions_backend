@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from shortuuid.django_fields import ShortUUIDField, ShortUUID
 from core.geo_finder import get_location
 from apps.notification.models import Mahalla
 
