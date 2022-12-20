@@ -45,9 +45,9 @@ class NotificationCreateSerializer(serializers.ModelSerializer):
             notification = Notification.objects.create(**validated_data)
             for mahalla in mahalla_data:
                 notification.mahalla.add(mahalla)
-            send_notification.apply_async(args=['notification',self.context['request'].data])
+            send_notification.apply_async(args=['notification',NotificationSerializer(notification).data])
             return notification
-        return serializers.ValidationError("Only admins can perform this operations")
+        raise serializers.ValidationError({"message": "Only admins can perform this operations"})
     
     def update(self, instance, validated_data):
         instance.title = validated_data.get('title', instance.title)
