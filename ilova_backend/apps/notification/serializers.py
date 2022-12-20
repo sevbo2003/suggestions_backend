@@ -2,7 +2,7 @@ from rest_framework import serializers
 from apps.notification.models import Mahalla, Notification
 from django.conf import settings
 
-from apps.notification.tasks import send_notification
+from apps.notification.tasks import save_notification_to_notification_users
 
 
 class MahallaSerializer(serializers.ModelSerializer):
@@ -45,7 +45,7 @@ class NotificationCreateSerializer(serializers.ModelSerializer):
             notification = Notification.objects.create(**validated_data)
             for mahalla in mahalla_data:
                 notification.mahalla.add(mahalla)
-            send_notification.apply_async(args=['notification',NotificationSerializer(notification).data])
+            save_notification_to_notification_users.apply_async(args=[notification.id, 'notification',NotificationSerializer(notification).data])
             return notification
         raise serializers.ValidationError({"message": "Only admins can perform this operations"})
     
