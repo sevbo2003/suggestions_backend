@@ -66,11 +66,14 @@ class CreateProblemSerializer(serializers.ModelSerializer):
         problem_types = validated_data.pop('problem_types')
         uploaded_data = validated_data.pop('uploaded_images')
         validated_data['city'], validated_data['district'] = get_location(str(validated_data['location'].lon), str(validated_data['location'].lat))
-        mahalla = validated_data['mahalla']
-        if mahalla is not None:
-            user = self.context['request'].user
-            user.mahallalar.add(mahalla)
-            user.save()
+        try:
+            mahalla = validated_data['mahalla']
+            if mahalla is not None:
+                user = self.context['request'].user
+                user.mahallalar.add(mahalla)
+                user.save()
+        except:
+            pass
         problem = Problem.objects.create(**validated_data)
         for problem_type in problem_types:
             problem.problem_types.add(problem_type)
