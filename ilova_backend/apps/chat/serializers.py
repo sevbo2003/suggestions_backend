@@ -55,4 +55,7 @@ class MessageFileSerializer(serializers.ModelSerializer):
     
     def get_file_link(self, obj):
         return settings.SITE_URL + obj.file.url
-    
+
+
+class MessageIsReadedSerializer(serializers.Serializer):
+    messages = serializers.ListField(child=serializers.IntegerField())

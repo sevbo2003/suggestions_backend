@@ -1,5 +1,6 @@
 from rest_framework.viewsets import ModelViewSet, ViewSet
-from apps.chat.serializers import MessageSerializer, ChatProblemSerializer, MessageFileSerializer
+from rest_framework.views import APIView
+from apps.chat.serializers import MessageSerializer, ChatProblemSerializer, MessageFileSerializer, MessageIsReadedSerializer
 from apps.chat.models import Message, ChatProblem, MessageFile
 from apps.chat.permission import IsOwberOrReadOnly
 from apps.suggestions.models import Problem
@@ -119,3 +120,10 @@ class MessageFileViewSet(ViewSet):
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
+
+class MessageIsReadView(ViewSet):
+    def create(self, request, *args, **kwargs):
+        messages = request.data['messages']
+        Message.objects.filter(id__in=messages).update(is_read=True)
+        return Response(status=status.HTTP_200_OK)
+        
