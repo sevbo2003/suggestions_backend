@@ -32,15 +32,17 @@ class ChatViewSet(ModelViewSet):
     
     def create(self, request, *args, **kwargs):
         problem = Problem.objects.get(id=request.data['problem'])
-        if problem.user == request.user:
-            try:
-                chat_problem = ChatProblem.objects.get(problem=problem)
-                serializer = ChatProblemSerializer(chat_problem)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            except:
-                chat_problem = ChatProblem.objects.create(problem=problem)
-                serializer = ChatProblemSerializer(chat_problem)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if request.user.is_authenticated:
+            if problem.user == request.user or request.user.is_superuser:
+                try:
+                    chat_problem = ChatProblem.objects.get(problem=problem)
+                    serializer = ChatProblemSerializer(chat_problem)
+                    return Response(serializer.data, status=status.HTTP_200_OK)
+                except:
+                    chat_problem = ChatProblem.objects.create(problem=problem)
+                    serializer = ChatProblemSerializer(chat_problem)
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({"message": "You don't have permission to do this operation"}, status=status.HTTP_400_BAD_REQUEST)
         return Response({"message": "You don't have permission to do this operation"}, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
