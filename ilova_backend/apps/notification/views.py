@@ -1,7 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import permissions
-from apps.notification.models import Notification, UserNotification
-from apps.notification.serializers import NotificationSerializer, NotificationCreateSerializer, UserNotificationSerializer
+from apps.notification.models import Notification, UserNotification, Mahalla
+from apps.notification.serializers import NotificationSerializer, NotificationCreateSerializer, UserNotificationSerializer, MahallaSerializer
+from apps.notification.filters import MahallaFilter
 from apps.notification.permissions import IsNotificationOwner
 from rest_framework.validators import ValidationError
 
@@ -33,3 +34,10 @@ class UserNotificationViewSet(ModelViewSet):
             object.save()
             return object
         raise ValidationError({"message": "You can't access this notification"})
+
+
+class MahallaViewSet(ModelViewSet):
+    queryset = Mahalla.objects.all()
+    serializer_class = MahallaSerializer
+    filterset_class = MahallaFilter
+    permission_classes = [permissions.IsAuthenticated]

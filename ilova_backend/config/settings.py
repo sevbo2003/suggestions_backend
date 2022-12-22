@@ -240,7 +240,7 @@ APP_DESCRIPTION = 'A RESTfull API for project Ilova API'
 PHONE_LOGIN_ATTEMPTS = 10
 PHONE_LOGIN_OTP_LENGTH = 5
 PHONE_LOGIN_OTP_HASH_ALGORITHM = 'sha256'
-PHONE_LOGIN_DEBUG = getenv('PHONE_LOGIN_DEBUG', type=bool, default=False)
+PHONE_LOGIN_DEBUG = getenv('PHONE_LOGIN_DEBUG', type=bool, default=True)
 
 # Configure the ESKIZ (for eskiz_sms integration)
 ESKIZ_EMAIL = os.getenv('ESKIZ_EMAIL')
