@@ -18,7 +18,18 @@ eskiz = EskizSMS(
             email=getattr(settings, 'ESKIZ_EMAIL', None),
             password=getattr(settings, 'ESKIZ_PASSWORD', None),
         )
+class Tuman(models.Model):
+    tuman = models.CharField(max_length=200)
+    mahallalar = models.ManyToManyField(Mahalla)
 
+    def __str__(self) -> str:
+        return self.tuman
+
+
+class Viloyat(models.Model):
+    viloyat = models.CharField(max_length=200)
+    tumanlar = models.ManyToManyField(Tuman)
+    
 
 class PhoneNumberAbstactUser(AbstractUser):
     phone_number = PhoneNumberField(unique=True)
