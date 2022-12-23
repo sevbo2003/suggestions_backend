@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import PhoneToken, PhoneNumberAbstactUser
+from .models import PhoneToken, PhoneNumberAbstactUser, Viloyat, Tuman
 
 
 class PhoneNumberAbstactUserAdmin(admin.ModelAdmin):
@@ -28,3 +28,5 @@ class PhoneTokenAdmin(admin.ModelAdmin):
 
 
 admin.site.register(PhoneToken, PhoneTokenAdmin)
+admin.site.register(Viloyat)
+admin.site.register(Tuman)
