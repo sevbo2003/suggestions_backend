@@ -76,6 +76,12 @@ class ChatViewSet(ModelViewSet):
         serializer = MessageSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
+    @action(detail=False, methods=['get'])
+    def get_all_chats(self, request):
+        if request.user.is_superuser:
+            chats = ChatProblem.objects.values_list('id', flat=True)
+            return Response(chats, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=['get'])
     def messages(self, request, pk=None):
         chat = self.get_object()
