@@ -8,6 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.filters import SearchFilter
 
 
 class ChatViewSet(ModelViewSet):
@@ -15,6 +16,8 @@ class ChatViewSet(ModelViewSet):
     serializer_class = ChatProblemSerializer
     permission_classes = [IsOwberOrReadOnly, IsAuthenticated]
     http_method_names = ['get', 'post', 'head', 'options', 'delete']
+    filter_backends = [SearchFilter]
+    search_fields = ['problem__city', 'problem__district']
 
     def get_queryset(self):
         if self.request.user.is_superuser:
