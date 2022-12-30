@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from apps.chat.models import Message, ChatProblem, MessageFile
+from apps.chat.models import Message, ChatProblem, MessageFile, SenderType
 from apps.suggestions.serializers import ProblemSerializer
 from django.conf import settings
 
 
 class ChatProblemSerializer(serializers.ModelSerializer):
     problem = ProblemSerializer()
+    last_message = serializers.SerializerMethodField()
 
     class Meta:
         model = ChatProblem
@@ -18,6 +19,26 @@ class ChatProblemSerializer(serializers.ModelSerializer):
         chat_problem.problem = problem
         chat_problem.save()
         return chat_problem     
+    
+    def get_last_message(self, obj):
+        try:
+            return {
+                "last_message": obj.last_message,
+                "last_message_date": obj.last_message_date,
+                "unread_messages": {
+                    "admin": obj.messages.filter(sender=SenderType.ADMIN, is_read=False).count(),
+                    "user": obj.messages.filter(sender=SenderType.USER, is_read=False).count()
+                }
+            }
+        except:
+            return {
+                "last_message": "",
+                "last_message_date": None,
+                "unread_messages": {
+                    "admin": obj.messages.filter(sender=SenderType.ADMIN, is_read=False).count(),
+                    "user": obj.messages.filter(sender=SenderType.USER, is_read=False).count()
+                }
+            }
 
 
 class MessageSerializer(serializers.ModelSerializer):
