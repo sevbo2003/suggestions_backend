@@ -16,6 +16,10 @@ class ChatProblem(models.Model):
         return self.messages.first().message if self.messages.first() else None
     
     @property
+    def last_message_date(self):
+        return self.messages.first().date if self.messages.first() else None
+    
+    @property
     def user(self):
         return self.problem.user
 
