@@ -1,6 +1,11 @@
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.views import APIView
-from apps.chat.serializers import MessageSerializer, ChatProblemSerializer, MessageFileSerializer, MessageIsReadedSerializer
+from apps.chat.serializers import (
+    MessageSerializer,
+    ChatProblemSerializer,
+    MessageFileSerializer,
+    MessageIsReadedSerializer,
+)
 from apps.chat.models import Message, ChatProblem, MessageFile
 from apps.chat.permission import IsOwberOrReadOnly
 from apps.suggestions.models import Problem
@@ -15,27 +20,26 @@ class ChatViewSet(ModelViewSet):
     queryset = ChatProblem.objects.all()
     serializer_class = ChatProblemSerializer
     permission_classes = [IsOwberOrReadOnly, IsAuthenticated]
-    http_method_names = ['get', 'post', 'head', 'options', 'delete']
+    http_method_names = ["get", "post", "head", "options", "delete"]
     filter_backends = [SearchFilter]
-    search_fields = ['problem__city', 'problem__district']
+    search_fields = ["problem__city", "problem__district"]
 
     def get_queryset(self):
         if self.request.user.is_superuser:
             return self.queryset
         else:
-            return self.queryset.filter(problem__user = self.request.user)
-        
+            return self.queryset.filter(problem__user=self.request.user)
 
     def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
+        partial = kwargs.pop("partial", False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
     def create(self, request, *args, **kwargs):
-        problem = Problem.objects.get(id=request.data['problem'])
+        problem = Problem.objects.get(id=request.data["problem"])
         if request.user.is_authenticated:
             if problem.user == request.user or request.user.is_superuser:
                 try:
@@ -46,8 +50,14 @@ class ChatViewSet(ModelViewSet):
                     chat_problem = ChatProblem.objects.create(problem=problem)
                     serializer = ChatProblemSerializer(chat_problem)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response({"message": "You don't have permission to do this operation"}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({"message": "You don't have permission to do this operation"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "You don't have permission to do this operation"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            {"message": "You don't have permission to do this operation"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -57,35 +67,39 @@ class ChatViewSet(ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def get_read_messages(self, request, pk=None):
         chat = self.get_object()
-        page = self.paginate_queryset(Message.objects.filter(chat_problem=chat, is_read=True))
+        page = self.paginate_queryset(
+            Message.objects.filter(chat_problem=chat, is_read=True)
+        )
         if page is not None:
             serializer = MessageSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         queryset = Message.objects.filter(chat_problem=chat, is_read=True)
         serializer = MessageSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    @action(detail=True, methods=['get'])
+
+    @action(detail=True, methods=["get"])
     def get_unread_messages(self, request, pk=None):
         chat = self.get_object()
-        page = self.paginate_queryset(Message.objects.filter(chat_problem=chat, is_read=False))
+        page = self.paginate_queryset(
+            Message.objects.filter(chat_problem=chat, is_read=False)
+        )
         if page is not None:
             serializer = MessageSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
         queryset = Message.objects.filter(chat_problem=chat, is_read=False)
         serializer = MessageSerializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    @action(detail=False, methods=['get'])
+
+    @action(detail=False, methods=["get"])
     def get_all_chats(self, request):
         if request.user.is_superuser:
-            chats = ChatProblem.objects.values_list('id', flat=True)
+            chats = ChatProblem.objects.values_list("id", flat=True)
             return Response(chats, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=True, methods=["get"])
     def messages(self, request, pk=None):
         chat = self.get_object()
         page = self.paginate_queryset(Message.objects.filter(chat_problem=chat))
@@ -101,11 +115,11 @@ class MessageFileViewSet(ViewSet):
     queryset = MessageFile.objects.all()
     serializer_class = MessageFileSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['post', 'head', 'options', 'delete']
+    http_method_names = ["post", "head", "options", "delete"]
 
     def get_object(self):
-        return MessageFile.objects.get(id=self.kwargs['pk'])
-    
+        return MessageFile.objects.get(id=self.kwargs["pk"])
+
     def perform_destroy(self, instance):
         instance.delete()
 
@@ -114,7 +128,7 @@ class MessageFileViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         self.perform_destroy(instance)
@@ -122,17 +136,40 @@ class MessageFileViewSet(ViewSet):
 
     def list(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
     def retrieve(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def update(self, request, *args, **kwargs):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
-    
+
 
 class MessageIsReadView(ViewSet):
     def create(self, request, *args, **kwargs):
-        messages = request.data['messages']
+        messages = request.data["messages"]
         Message.objects.filter(id__in=messages).update(is_read=True)
         return Response(status=status.HTTP_200_OK)
-        
+
+
+class GetProblemChatView(ViewSet):
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            problem = Problem.objects.get(id=self.kwargs["pk"])
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        if problem.user == request.user or request.user.is_superuser:
+            try:
+                chat_problem = ChatProblem.objects.get(problem=problem)
+                serializer = ChatProblemSerializer(chat_problem)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            except:
+                print("Came")
+                return Response(status=status.HTTP_404_NOT_FOUND)
+
+        return Response(
+            {"message": "You don't have permission to do this operation"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
